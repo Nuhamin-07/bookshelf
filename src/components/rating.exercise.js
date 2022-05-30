@@ -1,11 +1,11 @@
 /** @jsx jsx */
-import {jsx} from '@emotion/core'
+import { jsx } from '@emotion/core'
 
 import * as React from 'react'
-// 🐨 you'll need useMutation and queryCache from react-query
-// 🐨 you'll also need the client from utils/api-client
-import {FaStar} from 'react-icons/fa'
+import { useUpdateListItem } from 'utils/list-items'
+import { FaStar } from 'react-icons/fa'
 import * as colors from 'styles/colors'
+import { ErrorMessage } from "./lib"
 
 const visuallyHiddenCSS = {
   border: '0',
@@ -18,15 +18,11 @@ const visuallyHiddenCSS = {
   width: '1px',
 }
 
-function Rating({listItem, user}) {
+function Rating({ listItem, user }) {
   const [isTabbing, setIsTabbing] = React.useState(false)
-  // 🐨 call useMutation here and call the function "update"
-  // the mutate function should call the list-items/:listItemId endpoint with a PUT
-  //   and the updates as data. The mutate function will be called with the updates
-  //   you can pass as data.
-  // 💰 if you want to get the list-items cache updated after this query finishes
-  // the use the `onSettled` config option to queryCache.invalidateQueries('list-items')
-  const update = () => {}
+
+  const [update, { error, isError }] = useUpdateListItem(user)
+
 
   React.useEffect(() => {
     function handleKeyDown(event) {
@@ -34,13 +30,13 @@ function Rating({listItem, user}) {
         setIsTabbing(true)
       }
     }
-    document.addEventListener('keydown', handleKeyDown, {once: true})
+    document.addEventListener('keydown', handleKeyDown, { once: true })
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [])
 
   const rootClassName = `list-item-${listItem.id}`
 
-  const stars = Array.from({length: 5}).map((x, i) => {
+  const stars = Array.from({ length: 5 }).map((x, i) => {
     const ratingId = `rating-${listItem.id}-${i}`
     const ratingValue = i + 1
     return (
@@ -52,13 +48,13 @@ function Rating({listItem, user}) {
           value={ratingValue}
           checked={ratingValue === listItem.rating}
           onChange={() => {
-            update({id: listItem.id, rating: ratingValue})
+            update({ id: listItem.id, rating: ratingValue })
           }}
           css={[
             visuallyHiddenCSS,
             {
-              [`.${rootClassName} &:checked ~ label`]: {color: colors.gray20},
-              [`.${rootClassName} &:checked + label`]: {color: 'orange'},
+              [`.${rootClassName} &:checked ~ label`]: { color: colors.gray20 },
+              [`.${rootClassName} &:checked + label`]: { color: 'orange' },
               // !important is here because we're doing special non-css-in-js things
               // and so we have to deal with specificity and cascade. But, I promise
               // this is better than trying to make this work with JavaScript.
@@ -88,7 +84,7 @@ function Rating({listItem, user}) {
           <span css={visuallyHiddenCSS}>
             {ratingValue} {ratingValue === 1 ? 'star' : 'stars'}
           </span>
-          <FaStar css={{width: '16px', margin: '0 2px'}} />
+          <FaStar css={{ width: '16px', margin: '0 2px' }} />
         </label>
       </React.Fragment>
     )
@@ -105,9 +101,10 @@ function Rating({listItem, user}) {
         },
       }}
     >
-      <span css={{display: 'flex'}}>{stars}</span>
+      <span css={{ display: 'flex' }}>{stars}</span>
+      {isError ? <ErrorMessage error={error} variant="inline" css={{ marginLeft: 6, fontSize: "0.7em" }} /> : null}
     </div>
   )
 }
 
-export {Rating}
+export { Rating }
