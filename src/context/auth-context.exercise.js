@@ -1,18 +1,20 @@
 /** @jsx jsx */
-import {jsx} from '@emotion/core'
+import { jsx } from '@emotion/core'
 
 import * as React from 'react'
+import { queryCache } from 'react-query'
 import * as auth from 'auth-provider'
-import {client} from 'utils/api-client'
-import {useAsync} from 'utils/hooks'
-import {FullPageSpinner, FullPageErrorFallback} from 'components/lib'
+import { client } from 'utils/api-client'
+import { useAsync } from 'utils/hooks'
+import { FullPageSpinner, FullPageErrorFallback } from 'components/lib'
 
 async function getUser() {
   let user = null
 
   const token = await auth.getToken()
   if (token) {
-    const data = await client('me', {token})
+    const data = await client('bootstrap', { token })
+    queryCache.setQueryData('list-items', data.listItems, { staleTime: 5000 })
     user = data.user
   }
 
@@ -21,6 +23,8 @@ async function getUser() {
 
 const AuthContext = React.createContext()
 AuthContext.displayName = 'AuthContext'
+
+const userPromise = getUser()
 
 function AuthProvider(props) {
   const {
@@ -43,7 +47,7 @@ function AuthProvider(props) {
     // have to wait until the app mounts before we kick off
     // the request.
     // We're moving from "Fetch on render" to "Render WHILE you fetch"!
-    const userPromise = getUser()
+
     run(userPromise)
   }, [run])
 
@@ -60,7 +64,7 @@ function AuthProvider(props) {
     setData(null)
   }, [setData])
 
-  const value = React.useMemo(() => ({user, login, logout, register}), [
+  const value = React.useMemo(() => ({ user, login, logout, register }), [
     login,
     logout,
     register,
@@ -92,12 +96,12 @@ function useAuth() {
 
 function useClient() {
   const {
-    user: {token},
+    user: { token },
   } = useAuth()
   return React.useCallback(
-    (endpoint, config) => client(endpoint, {...config, token}),
+    (endpoint, config) => client(endpoint, { ...config, token }),
     [token],
   )
 }
 
-export {AuthProvider, useAuth, useClient}
+export { AuthProvider, useAuth, useClient }
