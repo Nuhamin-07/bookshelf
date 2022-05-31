@@ -17,25 +17,25 @@ function useSafeDispatch(dispatch) {
 // React.useEffect(() => {
 //   run(fetchPokemon(pokemonName))
 // }, [pokemonName, run])
-const defaultInitialState = {status: 'idle', data: null, error: null}
+const defaultInitialState = { status: 'idle', data: null, error: null }
 function useAsync(initialState) {
   const initialStateRef = React.useRef({
     ...defaultInitialState,
     ...initialState,
   })
-  const [{status, data, error}, setState] = React.useReducer(
-    (s, a) => ({...s, ...a}),
+  const [{ status, data, error }, setState] = React.useReducer(
+    (s, a) => ({ ...s, ...a }),
     initialStateRef.current,
   )
 
   const safeSetState = useSafeDispatch(setState)
 
   const setData = React.useCallback(
-    data => safeSetState({data, status: 'resolved'}),
+    data => safeSetState({ data, status: 'resolved' }),
     [safeSetState],
   )
   const setError = React.useCallback(
-    error => safeSetState({error, status: 'rejected'}),
+    error => safeSetState({ error, status: 'rejected' }),
     [safeSetState],
   )
   const reset = React.useCallback(
@@ -50,7 +50,7 @@ function useAsync(initialState) {
           `The argument passed to useAsync().run must be a promise. Maybe a function that's passed isn't returning anything?`,
         )
       }
-      safeSetState({status: 'pending'})
+      safeSetState({ status: 'pending' })
       return promise.then(
         data => {
           setData(data)
@@ -82,4 +82,4 @@ function useAsync(initialState) {
   }
 }
 
-export {useAsync}
+export { useAsync }

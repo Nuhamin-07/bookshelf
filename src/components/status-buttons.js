@@ -1,5 +1,5 @@
 /** @jsx jsx */
-import {jsx} from '@emotion/core'
+import { jsx } from '@emotion/core'
 
 import * as React from 'react'
 import {
@@ -17,11 +17,11 @@ import {
   useCreateListItem,
 } from 'utils/list-items'
 import * as colors from 'styles/colors'
-import {useAsync} from 'utils/hooks'
-import {CircleButton, Spinner} from './lib'
+import { useAsync } from 'utils/hooks'
+import { CircleButton, Spinner } from './lib'
 
-function TooltipButton({label, highlight, onClick, icon, ...rest}) {
-  const {isLoading, isError, error, run, reset} = useAsync()
+function TooltipButton({ label, highlight, onClick, icon, ...rest }) {
+  const { isLoading, isError, error, run, reset } = useAsync()
 
   function handleClick() {
     if (isError) {
@@ -40,8 +40,8 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
             color: isLoading
               ? colors.gray80
               : isError
-              ? colors.danger
-              : highlight,
+                ? colors.danger
+                : highlight,
           },
         }}
         disabled={isLoading}
@@ -55,12 +55,12 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
   )
 }
 
-function StatusButtons({book}) {
+function StatusButtons({ book }) {
   const listItem = useListItem(book.id)
 
-  const [mutate] = useUpdateListItem({throwOnError: true})
-  const [handleRemoveClick] = useRemoveListItem({throwOnError: true})
-  const [handleAddClick] = useCreateListItem({throwOnError: true})
+  const [mutate] = useUpdateListItem({ throwOnError: true })
+  const [handleRemoveClick] = useRemoveListItem({ throwOnError: true })
+  const [handleAddClick] = useCreateListItem({ throwOnError: true })
 
   return (
     <React.Fragment>
@@ -69,14 +69,14 @@ function StatusButtons({book}) {
           <TooltipButton
             label="Unmark as read"
             highlight={colors.yellow}
-            onClick={() => mutate({id: listItem.id, finishDate: null})}
+            onClick={() => mutate({ id: listItem.id, finishDate: null })}
             icon={<FaBook />}
           />
         ) : (
           <TooltipButton
             label="Mark as read"
             highlight={colors.green}
-            onClick={() => mutate({id: listItem.id, finishDate: Date.now()})}
+            onClick={() => mutate({ id: listItem.id, finishDate: Date.now() })}
             icon={<FaCheckCircle />}
           />
         )
@@ -85,14 +85,14 @@ function StatusButtons({book}) {
         <TooltipButton
           label="Remove from list"
           highlight={colors.danger}
-          onClick={() => handleRemoveClick({id: listItem.id})}
+          onClick={() => handleRemoveClick({ id: listItem.id })}
           icon={<FaMinusCircle />}
         />
       ) : (
         <TooltipButton
           label="Add to list"
           highlight={colors.indigo}
-          onClick={() => handleAddClick({bookId: book.id})}
+          onClick={() => handleAddClick({ bookId: book.id })}
           icon={<FaPlusCircle />}
         />
       )}
@@ -100,4 +100,4 @@ function StatusButtons({book}) {
   )
 }
 
-export {StatusButtons}
+export { StatusButtons }
